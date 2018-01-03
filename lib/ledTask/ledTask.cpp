@@ -8,6 +8,7 @@ namespace ledTask
     , _queue(queue)
     , _pin(pin)
     , _flashState(HIGH)
+    , _count(0)
     {
         pinMode(pin, OUTPUT);
     }
@@ -17,6 +18,7 @@ namespace ledTask
         if(!_queue.isEmpty())
         {
             _info = _queue.pop();
+            _count = 0;
         }
         switch(_info._state)
         {
@@ -27,8 +29,14 @@ namespace ledTask
                 digitalWrite(_pin, LOW);
                 break;
             case LEDInfo::LEDState::eFlash:
-                digitalWrite(_pin, _flashState);
-                _flashState = !_flashState;
+            
+                if(_count >= _info._period)
+                {
+                    digitalWrite(_pin, _flashState);
+                    _flashState = !_flashState;
+                    _count = 0;
+                }
+                ++_count;
                 break;
         }
     }

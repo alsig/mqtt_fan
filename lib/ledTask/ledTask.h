@@ -14,13 +14,13 @@ namespace ledTask
                 eOn,
                 eOff
             };
-            LEDInfo(LEDState state = LEDState::eOff, uint8_t freq = 0)
+            LEDInfo(const LEDState state = LEDState::eOff, const uint8_t period = 0)
             : _state(state)
-            , _freq(freq)
+            , _period(period)
             {    
             }
             LEDState    _state;
-            uint8_t     _freq;
+            uint8_t     _period;
     };
 
     class LEDTask : public scheduler::Runnable
@@ -29,9 +29,10 @@ namespace ledTask
             LEDTask(QueueArray<LEDInfo>& queue, const uint8_t pin) ;
         private:
             void run() override;
-            QueueArray<LEDInfo> _queue;
-            const uint8_t       _pin;
-            uint8_t             _flashState;
-            LEDInfo             _info;
+            QueueArray<LEDInfo>&    _queue;
+            const uint8_t           _pin;
+            uint8_t                 _flashState;
+            LEDInfo                 _info;
+            uint8_t                 _count;
     };
 }

@@ -62,6 +62,9 @@ class QueueArray {
     // init the queue (constructor).
     QueueArray ();
 
+    // init with initial capacity
+    QueueArray (const uint8_t capacity);
+
     // clear the queue (destructor).
     ~QueueArray ();
 
@@ -142,6 +145,28 @@ QueueArray<T>::QueueArray () {
   // set the initial size of the queue.
   size = initialSize;
 }
+
+template<typename T>
+QueueArray<T>::QueueArray (const uint8_t capacity) {
+  size = 0;       // set the size of queue to zero.
+  items = 0;      // set the number of items of queue to zero.
+
+  head = 0;       // set the head of the queue to zero.
+  tail = 0;       // set the tail of the queue to zero.
+
+  printer = NULL; // set the printer of queue to point nowhere.
+
+  // allocate enough memory for the array.
+  contents = (T *) malloc (sizeof (T) * capacity);
+
+  // if there is a memory allocation error.
+  if (contents == NULL)
+    exit ("QUEUE: insufficient memory to initialize queue.");
+
+  // set the initial size of the queue.
+  size = capacity;
+}
+
 
 // clear the queue (destructor).
 template<typename T>

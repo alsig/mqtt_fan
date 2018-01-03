@@ -14,7 +14,7 @@
 #include "common.h"
 static const uint8_t LED = 2;
 
-QueueArray<ledTask::LEDInfo> ledQueue;
+QueueArray<ledTask::LEDInfo> ledQueue(5);
 
 
 /*class Button : public scheduler::Runnable
@@ -46,10 +46,9 @@ void setup()
     
     ledTask::LEDTask* ledTask = new ledTask::LEDTask(ledQueue, LED);
     //Button* button = new Button(ledQueue);
-    ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eFlash);
-
+    ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eFlash, 2);
     ledQueue.push(ledInfo);
-
+    
     ArduinoOTA.onStart([]() 
     {
         Serial.println("OTA Start");
