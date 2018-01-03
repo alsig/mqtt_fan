@@ -11,29 +11,13 @@
 #include "runnable.h"
 #include <QueueArray.h>
 #include "ledtask.h"
+#include "buttonTask.h"
 #include "common.h"
 static const uint8_t LED = 2;
+static const uint8_t BUTTON = 4;
 
 QueueArray<ledTask::LEDInfo> ledQueue(5);
-
-
-/*class Button : public scheduler::Runnable
-{
-    public:
-        Button(QueueArray<LEDState>& queue) 
-        : Runnable(50)
-        , _queue(queue)
-        {
-            pinMode(4, INPUT);
-        } 
-    private:
-        void run() override
-        {
-            //flash = (digitalRead(4) == HIGH);          
-        }
-        QueueArray<LEDState> _queue;
-
-};*/
+QueueArray<buttonTask::ButtonState> buttonQueue(5);
 
 void setup() 
 {   
@@ -45,7 +29,7 @@ void setup()
 
     
     ledTask::LEDTask* ledTask = new ledTask::LEDTask(ledQueue, LED);
-    //Button* button = new Button(ledQueue);
+    buttonTask::ButtonTask* buttonTask = new buttonTask::ButtonTask(buttonQueue, BUTTON);
     ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eFlash, 2);
     ledQueue.push(ledInfo);
     
