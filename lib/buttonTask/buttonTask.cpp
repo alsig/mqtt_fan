@@ -2,7 +2,7 @@
 
 namespace buttonTask
 {
-    ButtonTask::ButtonTask(QueueArray<ButtonState>& queue, const uint8_t pin, const uint8_t scanRate)
+    ButtonTask::ButtonTask(QueueArray<ButtonState>* queue, const uint8_t pin, const uint8_t scanRate)
     : Runnable(scanRate) 
     , _queue(queue)
     , _pin(pin)
@@ -18,14 +18,14 @@ namespace buttonTask
         {
             Serial.println("ePushed");
             _buttonState = ButtonState::ePushed;
-            _queue.push(_buttonState);
+            _queue->push(_buttonState);
         }
         else if(currentPinState == LOW && _lastPinState == HIGH)
         {
             Serial.println("eReleased");          
             _buttonState = ButtonState::eReleased;
             _counter = 0; 
-            _queue.push(_buttonState);            
+            _queue->push(_buttonState);            
         }
         _lastPinState = currentPinState;
 
@@ -36,6 +36,7 @@ namespace buttonTask
             {
                 Serial.println("eLongPush");                           
                 _buttonState = ButtonState::eLongPush;
+                _queue->push(_buttonState);
             }
         }
 

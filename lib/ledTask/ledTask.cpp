@@ -3,7 +3,7 @@
 namespace ledTask
 {
     static const uint8_t scanRate = 50;
-    LEDTask::LEDTask(QueueArray<LEDInfo>& queue, const uint8_t pin)
+    LEDTask::LEDTask(QueueArray<LEDInfo>* queue, const uint8_t pin)
     : Runnable(scanRate)
     , _queue(queue)
     , _pin(pin)
@@ -15,9 +15,9 @@ namespace ledTask
 
     void LEDTask::run(void)
     {
-        if(!_queue.isEmpty())
+        if(!_queue->isEmpty())
         {
-            _info = _queue.pop();
+            _info = _queue->pop();
             _count = 0;
         }
         switch(_info._state)

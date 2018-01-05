@@ -14,11 +14,11 @@ namespace buttonTask
     class ButtonTask : public scheduler::Runnable
     {
         public:
-            ButtonTask(QueueArray<ButtonState>& queue,  const uint8_t pin, const uint8_t scanRate = 1);
+            ButtonTask(QueueArray<ButtonState>* queue,  const uint8_t pin, const uint8_t scanRate = 1);
         private:
             void run() override;
 
-            QueueArray<ButtonState>& _queue;
+            QueueArray<ButtonState>* _queue;
             const uint8_t           _pin;
             uint8_t                 _lastPinState;
             ButtonState             _buttonState;

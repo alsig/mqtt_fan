@@ -16,8 +16,58 @@
 static const uint8_t LED = 2;
 static const uint8_t BUTTON = 4;
 
-QueueArray<ledTask::LEDInfo> ledQueue(5);
-QueueArray<buttonTask::ButtonState> buttonQueue(5);
+
+namespace app
+{
+    struct FanAppConfig
+    {
+        uint8_t _scanRate;
+        QueueArray<ledTask::LEDInfo>*           _ledTaskQueue;
+        QueueArray<buttonTask::ButtonState>*    _buttonTaskQueue;
+        initialSetup::MQTTBrokerInfo*           _mqttBrokerInfo;
+    };
+
+    class FanApp : scheduler::Runnable
+    {
+        public:
+            FanApp(FanAppConfig* config)
+            : Runnable(config->_scanRate)
+            , _config(config)
+            {
+                _mqttClient = new PubSubClient(_espClient);
+                Serial.printf("mqtt Info: %s, %d\n", _config->_mqttBrokerInfo->_addr, _config->_mqttBrokerInfo->_port);
+                _mqttClient->setServer(_config->_mqttBrokerInfo->_addr,_config->_mqttBrokerInfo->_port);
+                ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eFlash, 2);
+                _config->_ledTaskQueue->push(ledInfo);
+            }
+        private:
+            void run(void) override
+            {
+                if(!_config->_buttonTaskQueue->isEmpty())
+                {
+                    buttonTask::ButtonState buttonState = _config->_buttonTaskQueue->pop();
+                    if(buttonState == buttonTask::ButtonState::ePushed)
+                    {
+                        Serial.println("app::pushed");                    
+                        ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eOn);
+                        _config->_ledTaskQueue->push(ledInfo);
+                    }   
+                    else if(buttonState == buttonTask::ButtonState::eReleased)
+                    {
+                        Serial.println("app::released");
+                        ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eOff);
+                        _config->_ledTaskQueue->push(ledInfo);
+                    } 
+                }
+            }
+            FanAppConfig*   _config;
+            PubSubClient*   _mqttClient;
+            WiFiClient      _espClient;
+    };
+}
+
+
+
 
 void setup() 
 {   
@@ -27,11 +77,20 @@ void setup()
     initialSetup::InitialSetup initialSetup;
     initialSetup.run();
 
-    
+    QueueArray<ledTask::LEDInfo>* ledQueue = new QueueArray<ledTask::LEDInfo>(5);
+    QueueArray<buttonTask::ButtonState>* buttonQueue = new QueueArray<buttonTask::ButtonState>(5);
+
+
     ledTask::LEDTask* ledTask = new ledTask::LEDTask(ledQueue, LED);
     buttonTask::ButtonTask* buttonTask = new buttonTask::ButtonTask(buttonQueue, BUTTON);
-    ledTask::LEDInfo ledInfo(ledTask::LEDInfo::LEDState::eFlash, 2);
-    ledQueue.push(ledInfo);
+    
+    // App config
+    app::FanAppConfig* appConfig = new app::FanAppConfig;
+    appConfig->_scanRate = 20;
+    appConfig->_buttonTaskQueue = buttonQueue;
+    appConfig->_ledTaskQueue = ledQueue;
+    appConfig->_mqttBrokerInfo = initialSetup.getMQTTBrokerInfo();
+    app::FanApp* fanApp = new app::FanApp(appConfig);
     
     ArduinoOTA.onStart([]() 
     {
@@ -57,7 +116,6 @@ void setup()
         else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
     ArduinoOTA.begin();
-    
 }
 
 void loop() 

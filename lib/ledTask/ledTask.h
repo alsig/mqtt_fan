@@ -26,10 +26,10 @@ namespace ledTask
     class LEDTask : public scheduler::Runnable
     {
         public:
-            LEDTask(QueueArray<LEDInfo>& queue, const uint8_t pin) ;
+            LEDTask(QueueArray<LEDInfo>* queue, const uint8_t pin) ;
         private:
             void run() override;
-            QueueArray<LEDInfo>&    _queue;
+            QueueArray<LEDInfo>*    _queue;
             const uint8_t           _pin;
             uint8_t                 _flashState;
             LEDInfo                 _info;
