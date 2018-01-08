@@ -8,7 +8,7 @@ namespace initialSetup
     struct MQTTBrokerInfo
     {
             static const uint32_t addrLength = 64;
-            char _addr[addrLength]; // Needs init
+            char _addr[addrLength] = "hassbian"; 
             uint32_t _port;
     };
 
