@@ -10,9 +10,9 @@ namespace ledTask
         
             enum class LEDState
             {
-                eFlash,
+                eOff,
                 eOn,
-                eOff
+                eFlash
             };
             LEDInfo(const LEDState state = LEDState::eOff, const uint8_t period = 0)
             : _state(state)
@@ -26,7 +26,7 @@ namespace ledTask
     class LEDTask : public scheduler::Runnable
     {
         public:
-            LEDTask(QueueArray<LEDInfo>* queue, const uint8_t pin) ;
+            LEDTask(QueueArray<LEDInfo>* queue, const uint8_t pin, const bool invert=true);
         private:
             void run() override;
             QueueArray<LEDInfo>*    _queue;
@@ -34,5 +34,6 @@ namespace ledTask
             uint8_t                 _flashState;
             LEDInfo                 _info;
             uint8_t                 _count;
+            const bool              _invert;
     };
 }
