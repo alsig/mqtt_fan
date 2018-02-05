@@ -49,6 +49,8 @@ void setup()
     fanTaskConfig->_modeTopic = config::modeTopic;
     fanTaskConfig->_relayPin = &config::relayPin;
     fanTaskConfig->_dhtPin = &config::dhtPin;
+    fanTaskConfig->_temperatureThreshold = config::temperatureThreshold;
+    fanTaskConfig->_humidityThreshold = config::humidityThreshold;
     
     fanTask::FanTask* fanApp = new fanTask::FanTask(fanTaskConfig);
     
@@ -83,3 +85,4 @@ void loop()
     scheduler::SchedulerWrapper::run();
     ArduinoOTA.handle();
 }
+

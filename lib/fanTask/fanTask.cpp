@@ -75,6 +75,8 @@ namespace fanTask
 
     void FanTask::setRelay(const RelayState state)
     {
+        Serial.print("setRelay: ");
+        Serial.print(static_cast<uint8_t>(state));
         digitalWrite(*_config->_relayPin, state == RelayState::eOn);
     }
 
@@ -86,17 +88,28 @@ namespace fanTask
             _timeOut = _timeOutReload;
             float humidity = _dht->readHumidity();
             float temperature = _dht->readTemperature(false); // in celcius 
-            #if 0 // insert this code when dht sensor is ready
-            if(isnan(humidity) || isnan(temperature))
+            #if 1 // insert this code when dht sensor is ready
+            if(isnan(humidity))
             {
-                Serial.println("Error reading from DHT sensor");
+                Serial.println("Error reading humidity from DHT sensor");
+                return;
+            }
+            if(isnan(temperature))
+            {
+                Serial.println("Error reading temperature from DHT sensor");
                 return;
             }
             #else
                 humidity = 50.0f;
                 temperature = 23.0f;
             #endif
-
+            Serial.print("Humidity: ");
+            Serial.print(humidity);
+            Serial.print(" %\t Temperature: ");
+            Serial.print(temperature);
+            Serial.print(" *C ");
+            Serial.println("");
+            
             if(temperature - _temperatureDeadBand > _config->_temperatureThreshold)
             {
                 _relayState = RelayState::eOn;
