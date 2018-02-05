@@ -75,8 +75,6 @@ namespace fanTask
 
     void FanTask::setRelay(const RelayState state)
     {
-        Serial.print("setRelay: ");
-        Serial.print(static_cast<uint8_t>(state));
         digitalWrite(*_config->_relayPin, state == RelayState::eOn);
     }
 
